@@ -1,6 +1,7 @@
 from passlib.context import CryptContext
 from datetime import datetime,timedelta, timezone
-from jose import jwt
+from jose import jwt, JWTError
+
 from app.core.config import settings
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated= 'auto')
 
@@ -25,3 +26,11 @@ def create_refresh_token(data:dict) -> str:
     to_encode.update({'exp': expire})
 
     return jwt.encode(to_encode,settings.SECRET_KEY, algorithm=settings.ALGORITHM )
+
+
+def decode_token(token:str ) -> dict | None:
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        return payload
+    except JWTError:
+        return None
